@@ -1,7 +1,10 @@
 package shop.mtcoding.teamproject.board;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.annotation.W3CDomHandler;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +37,10 @@ public class BoardController {
     }
 
     @PostMapping("/comunity/save")
-    public String save(BoardRequest.SaveDTO saveDTO) {
+    public void save(BoardRequest.SaveDTO saveDTO, HttpServletResponse response) throws IOException {
         boardService.글쓰기(saveDTO);
-        return "redirect:/";
+        response.sendRedirect("/comunity");
+        // return "redirect:/comunity/comunityDetail";
     }
 
     @PostMapping("/comunity/{id}/delete")
@@ -60,10 +64,15 @@ public class BoardController {
 
     @GetMapping("/comunity/comunitydetail/{id}")
     public String detail(@PathVariable Integer id, Model model) {
-        Board board = boardService.상세보기(id);
-        model.addAttribute("board", board);
+        model.addAttribute("board", boardService.상세보기(id));
         return "comunity/comunityDetail";
     }
 
+    @PostMapping("/comunity/{id}/update")
+    public String update(@PathVariable Integer id, BoardRequest.UpdateDTO updateDTO) {
+        // where 데이터, body, session값
+        boardService.게시글수정하기(id, updateDTO);
+        return "redirect:/board/" + id;
+    }
 }
 // 컨트롤러에서는 model 써서 detail.mustache로 보낸다
